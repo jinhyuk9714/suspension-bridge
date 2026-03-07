@@ -1,5 +1,8 @@
+import { InstancedMesh, Matrix4, Quaternion, Vector3 } from 'three';
+
 import { BRIDGE_CONFIG } from './config';
-import { getSuspenderLayout } from './suspenders';
+import { getDeckShoulderProfile, getHangerSocketPoint } from './hangerConnections';
+import { createSuspenders, getSuspenderLayout } from './suspenders';
 
 describe('suspender layout', () => {
   it('keeps a regular mirrored spacing while clearing the tower openings', () => {
@@ -29,5 +32,42 @@ describe('suspender layout', () => {
         BRIDGE_CONFIG.suspenderTowerClearance
       );
     }
+  });
+
+  it('aligns suspender bottoms with the shared socket points and keeps left-right symmetry', () => {
+    const suspenders = createSuspenders(BRIDGE_CONFIG).object3d;
+    const instancedMesh = suspenders.children[0] as InstancedMesh;
+    const layout = getSuspenderLayout(BRIDGE_CONFIG);
+    const shoulderProfile = getDeckShoulderProfile(BRIDGE_CONFIG);
+    const matrix = new Matrix4();
+    const position = new Vector3();
+    const scale = new Vector3();
+    const quaternion = new Quaternion();
+
+    layout.forEach((x, layoutIndex) => {
+      for (const [offset, side] of [
+        [0, -1],
+        [1, 1]
+      ] as const) {
+        instancedMesh.getMatrixAt(layoutIndex * 2 + offset, matrix);
+        matrix.decompose(position, quaternion, scale);
+
+        const socket = getHangerSocketPoint(BRIDGE_CONFIG, x, side);
+        const bottomY = position.y - scale.y * 0.5;
+
+        expect(position.x).toBeCloseTo(socket.x, 6);
+        expect(position.z).toBeCloseTo(socket.z, 6);
+        expect(bottomY).toBeCloseTo(socket.y, 5);
+        expect(Math.abs(socket.z)).toBeGreaterThanOrEqual(shoulderProfile.innerZ);
+        expect(Math.abs(socket.z)).toBeLessThanOrEqual(shoulderProfile.outerZ);
+      }
+
+      const leftSocket = getHangerSocketPoint(BRIDGE_CONFIG, x, -1);
+      const rightSocket = getHangerSocketPoint(BRIDGE_CONFIG, x, 1);
+
+      expect(leftSocket.x).toBeCloseTo(rightSocket.x, 6);
+      expect(leftSocket.y).toBeCloseTo(rightSocket.y, 6);
+      expect(leftSocket.z).toBeCloseTo(-rightSocket.z, 6);
+    });
   });
 });

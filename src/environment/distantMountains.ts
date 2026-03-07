@@ -11,7 +11,54 @@ import {
 import type { WorldModule } from '../types/world';
 import { fbm2D } from '../utils/noise';
 
-const createRidge = (width: number, height: number, seed: number, color: number): Mesh => {
+export const DISTANT_MOUNTAIN_LAYERS = [
+  { width: 2200, height: 320, seed: 7, color: 0x8794a3, opacity: 0.24, position: [0, 104, -980], rotationY: 0 },
+  {
+    width: 2200,
+    height: 300,
+    seed: 19,
+    color: 0x8a97a5,
+    opacity: 0.22,
+    position: [0, 96, 980],
+    rotationY: Math.PI
+  },
+  { width: 1800, height: 260, seed: 11, color: 0x66717d, opacity: 0.42, position: [0, 72, -760], rotationY: 0 },
+  {
+    width: 1800,
+    height: 220,
+    seed: 31,
+    color: 0x6f7a86,
+    opacity: 0.38,
+    position: [0, 62, 780],
+    rotationY: Math.PI
+  },
+  {
+    width: 1500,
+    height: 210,
+    seed: 53,
+    color: 0x626c77,
+    opacity: 0.34,
+    position: [-820, 66, 0],
+    rotationY: Math.PI * 0.5
+  },
+  {
+    width: 1500,
+    height: 210,
+    seed: 71,
+    color: 0x5e6873,
+    opacity: 0.34,
+    position: [820, 66, 0],
+    rotationY: -Math.PI * 0.5
+  }
+] as const;
+
+const createRidge = (
+  width: number,
+  height: number,
+  seed: number,
+  color: number,
+  opacity: number
+): Mesh => {
   const geometry = new PlaneGeometry(width, height, 96, 16);
   const positions = geometry.attributes.position;
   const colors = new Float32Array(positions.count * 3);
@@ -43,7 +90,7 @@ const createRidge = (width: number, height: number, seed: number, color: number)
     new MeshStandardMaterial({
       vertexColors: true,
       transparent: true,
-      opacity: 0.62,
+      opacity,
       depthWrite: false,
       side: DoubleSide,
       roughness: 1,
@@ -56,12 +103,11 @@ export const createDistantMountains = (): WorldModule<Group> => {
   const group = new Group();
   group.name = 'distant-mountains';
 
-  const layers = [
-    { mesh: createRidge(1800, 260, 11, 0x5b6672), position: [0, 62, -760], rotationY: 0 },
-    { mesh: createRidge(1800, 220, 31, 0x6b7580), position: [0, 52, 780], rotationY: Math.PI },
-    { mesh: createRidge(1500, 210, 53, 0x5f6670), position: [-820, 58, 0], rotationY: Math.PI * 0.5 },
-    { mesh: createRidge(1500, 210, 71, 0x5a616c), position: [820, 58, 0], rotationY: -Math.PI * 0.5 }
-  ];
+  const layers = DISTANT_MOUNTAIN_LAYERS.map((layer) => ({
+    mesh: createRidge(layer.width, layer.height, layer.seed, layer.color, layer.opacity),
+    position: layer.position,
+    rotationY: layer.rotationY
+  }));
 
   layers.forEach(({ mesh, position, rotationY }) => {
     mesh.position.set(position[0], position[1], position[2]);

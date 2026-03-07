@@ -3,6 +3,17 @@ import { Color, DoubleSide, Group, Mesh, PlaneGeometry, ShaderMaterial } from 't
 import type { FrameState } from '../types/frame';
 import type { WorldModule } from '../types/world';
 
+interface MistLayerSetting {
+  width: number;
+  depth: number;
+  opacity: number;
+  y: number;
+  color: number;
+  timeOffset: number;
+}
+
+export const MIST_LAYER_SETTINGS: readonly MistLayerSetting[] = [];
+
 const mistVertexShader = `
   uniform float uTime;
   varying vec2 vUv;
@@ -36,11 +47,23 @@ const mistFragmentShader = `
   }
 `;
 
-const createMistLayer = (width: number, depth: number, opacity: number, y: number): Mesh => {
+const createMistLayer = ({
+  width,
+  depth,
+  opacity,
+  y,
+  color
+}: {
+  width: number;
+  depth: number;
+  opacity: number;
+  y: number;
+  color: number;
+}): Mesh => {
   const material = new ShaderMaterial({
     uniforms: {
       uTime: { value: 0 },
-      uColor: { value: new Color(0xd8d6d0) },
+      uColor: { value: new Color(color) },
       uOpacity: { value: opacity }
     },
     vertexShader: mistVertexShader,
@@ -62,15 +85,18 @@ export const createMist = (): WorldModule<Group> => {
   const group = new Group();
   group.name = 'mist';
 
-  const layers = [createMistLayer(1200, 380, 0.18, 1.8), createMistLayer(980, 300, 0.13, 4.2)];
-  layers.forEach((layer) => group.add(layer));
+  const layers = MIST_LAYER_SETTINGS.map((setting) => ({
+    mesh: createMistLayer(setting),
+    timeOffset: setting.timeOffset
+  }));
+  layers.forEach(({ mesh }) => group.add(mesh));
 
   return {
     object3d: group,
     update: ({ elapsed }: FrameState) => {
-      layers.forEach((layer, index) => {
-        const material = layer.material as ShaderMaterial;
-        material.uniforms.uTime.value = elapsed + index * 3.7;
+      layers.forEach(({ mesh, timeOffset }) => {
+        const material = mesh.material as ShaderMaterial;
+        material.uniforms.uTime.value = elapsed + timeOffset;
       });
     }
   };

@@ -11,6 +11,8 @@ import {
 import type { WorldModule } from '../types/world';
 import { createCableProfileSampler } from './cables';
 import type { BridgeConfig } from './config';
+import { getHangerSocketPoint } from './hangerConnections';
+import { BRIDGE_MATERIAL_SETTINGS } from './materials';
 
 const upVector = new Vector3(0, 1, 0);
 
@@ -41,9 +43,10 @@ export const createSuspenders = (config: BridgeConfig): WorldModule<Group> => {
 
   const geometry = new CylinderGeometry(config.suspenderRadius, config.suspenderRadius, 1, 10);
   const material = new MeshStandardMaterial({
-    color: 0xc6c9ce,
-    metalness: 0.9,
-    roughness: 0.25
+    color: BRIDGE_MATERIAL_SETTINGS.suspenders.color,
+    metalness: BRIDGE_MATERIAL_SETTINGS.suspenders.metalness,
+    roughness: BRIDGE_MATERIAL_SETTINGS.suspenders.roughness,
+    envMapIntensity: BRIDGE_MATERIAL_SETTINGS.suspenders.envMapIntensity
   });
 
   const layout = getSuspenderLayout(config);
@@ -55,9 +58,9 @@ export const createSuspenders = (config: BridgeConfig): WorldModule<Group> => {
   for (const x of layout) {
     for (const direction of [-1, 1] as const) {
       const cableY = sampleCableHeight(x);
-      const deckAttachY = config.deckHeight + 0.35;
-      const length = cableY - deckAttachY;
-      const position = new Vector3(x, deckAttachY + length * 0.5, direction * config.mainCableOffset);
+      const socketPoint = getHangerSocketPoint(config, x, direction);
+      const length = cableY - socketPoint.y;
+      const position = new Vector3(socketPoint.x, socketPoint.y + length * 0.5, socketPoint.z);
 
       matrix.compose(position, quaternion.setFromUnitVectors(upVector, upVector), new Vector3(1, length, 1));
       instancedMesh.setMatrixAt(index, matrix);

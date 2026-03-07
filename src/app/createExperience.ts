@@ -1,7 +1,8 @@
 import { Vector3 } from 'three';
 
 import { createBridge } from '../bridge';
-import { createCamera } from '../core/camera';
+import { BRIDGE_CONFIG } from '../bridge/config';
+import { createCamera, START_CAMERA_VIEW } from '../core/camera';
 import { createAnimationLoop } from '../core/animationLoop';
 import { createRenderer } from '../core/renderer';
 import { attachResize } from '../core/resize';
@@ -9,13 +10,13 @@ import { createScene } from '../core/scene';
 import { createOrbitKeyboardController } from '../controls/orbitKeyboardController';
 import { createClouds } from '../environment/clouds';
 import { createDistantMountains } from '../environment/distantMountains';
-import { createMist } from '../environment/mist';
 import { createSkyEnvironment } from '../environment/sky';
 import { createTerrain } from '../environment/terrain';
 import { createVegetation } from '../environment/vegetation';
 import { createWater } from '../environment/water';
 import { setupLighting } from '../lighting/setupLighting';
 import { createComposer } from '../postprocessing/composer';
+import { createTraffic } from '../traffic';
 import { disposeObject3D } from '../utils/dispose';
 
 export const createExperience = (container: HTMLElement): (() => void) => {
@@ -31,10 +32,10 @@ export const createExperience = (container: HTMLElement): (() => void) => {
   const sky = createSkyEnvironment(renderer, scene);
   const lighting = setupLighting(scene, sky.sunDirection);
 
-  const bridge = createBridge();
+  const bridge = createBridge(BRIDGE_CONFIG);
+  const traffic = createTraffic(BRIDGE_CONFIG);
   const terrain = createTerrain();
   const water = createWater();
-  const mist = createMist();
   const clouds = createClouds();
   const vegetation = createVegetation();
   const distantMountains = createDistantMountains();
@@ -43,12 +44,12 @@ export const createExperience = (container: HTMLElement): (() => void) => {
   scene.add(terrain.object3d);
   scene.add(water.object3d);
   scene.add(bridge.object3d);
+  scene.add(traffic.object3d);
   scene.add(vegetation.object3d);
-  scene.add(mist.object3d);
   scene.add(clouds.object3d);
 
   const cameraController = createOrbitKeyboardController(camera, renderer.domElement);
-  cameraController.controls.target.copy(new Vector3(0, 28, 0));
+  cameraController.controls.target.copy(START_CAMERA_VIEW.target);
   cameraController.controls.update();
 
   const composer = createComposer(renderer, scene, camera, {
@@ -64,8 +65,8 @@ export const createExperience = (container: HTMLElement): (() => void) => {
     composer,
     updatables: [
       cameraController,
+      ...(traffic.update ? [{ update: traffic.update }] : []),
       ...(water.update ? [{ update: water.update }] : []),
-      ...(mist.update ? [{ update: mist.update }] : []),
       ...(clouds.update ? [{ update: clouds.update }] : [])
     ]
   });

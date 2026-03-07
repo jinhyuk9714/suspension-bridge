@@ -10,6 +10,7 @@ import {
 
 import type { WorldModule } from '../types/world';
 import type { BridgeConfig } from './config';
+import { BRIDGE_MATERIAL_SETTINGS } from './materials';
 
 const upAxis = new Vector3(0, 1, 0);
 
@@ -106,9 +107,10 @@ export const createTowers = (config: BridgeConfig): WorldModule<Group> => {
   group.name = 'towers';
 
   const material = new MeshStandardMaterial({
-    color: 0x9d8f7f,
-    metalness: 0.48,
-    roughness: 0.56
+    color: BRIDGE_MATERIAL_SETTINGS.towers.color,
+    metalness: BRIDGE_MATERIAL_SETTINGS.towers.metalness,
+    roughness: BRIDGE_MATERIAL_SETTINGS.towers.roughness,
+    envMapIntensity: BRIDGE_MATERIAL_SETTINGS.towers.envMapIntensity
   });
 
   group.add(createTower(-config.towerX, config, material));

@@ -3,6 +3,7 @@ import { CatmullRomCurve3, Group, Mesh, MeshStandardMaterial, TubeGeometry, Vect
 import type { WorldModule } from '../types/world';
 import { lerp, smoothstep } from '../utils/math';
 import type { BridgeConfig } from './config';
+import { BRIDGE_MATERIAL_SETTINGS } from './materials';
 
 export const createCableProfileSampler =
   (config: BridgeConfig) =>
@@ -49,9 +50,10 @@ export const createMainCables = (config: BridgeConfig): WorldModule<Group> => {
   group.name = 'main-cables';
 
   const cableMaterial = new MeshStandardMaterial({
-    color: 0x2d3038,
-    metalness: 0.75,
-    roughness: 0.35
+    color: BRIDGE_MATERIAL_SETTINGS.mainCables.color,
+    metalness: BRIDGE_MATERIAL_SETTINGS.mainCables.metalness,
+    roughness: BRIDGE_MATERIAL_SETTINGS.mainCables.roughness,
+    envMapIntensity: BRIDGE_MATERIAL_SETTINGS.mainCables.envMapIntensity
   });
 
   for (const direction of [-1, 1] as const) {

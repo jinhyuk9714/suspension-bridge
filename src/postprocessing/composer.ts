@@ -3,6 +3,12 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
+export const BLOOM_SETTINGS = {
+  strength: 0.012,
+  radius: 0.4,
+  threshold: 0.99
+} as const;
+
 export const createComposer = (
   renderer: WebGLRenderer,
   scene: Scene,
@@ -12,7 +18,12 @@ export const createComposer = (
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
 
-  const bloom = new UnrealBloomPass(new Vector2(size.width, size.height), 0.16, 0.7, 0.88);
+  const bloom = new UnrealBloomPass(
+    new Vector2(size.width, size.height),
+    BLOOM_SETTINGS.strength,
+    BLOOM_SETTINGS.radius,
+    BLOOM_SETTINGS.threshold
+  );
   composer.addPass(bloom);
 
   return composer;

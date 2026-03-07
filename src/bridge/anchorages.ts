@@ -2,15 +2,17 @@ import { BoxGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
 
 import type { WorldModule } from '../types/world';
 import type { BridgeConfig } from './config';
+import { BRIDGE_MATERIAL_SETTINGS } from './materials';
 
 export const createAnchorages = (config: BridgeConfig): WorldModule<Group> => {
   const group = new Group();
   group.name = 'anchorages';
 
   const material = new MeshStandardMaterial({
-    color: 0x8f887f,
-    roughness: 0.95,
-    metalness: 0.04
+    color: BRIDGE_MATERIAL_SETTINGS.anchorages.color,
+    roughness: BRIDGE_MATERIAL_SETTINGS.anchorages.roughness,
+    metalness: BRIDGE_MATERIAL_SETTINGS.anchorages.metalness,
+    envMapIntensity: BRIDGE_MATERIAL_SETTINGS.anchorages.envMapIntensity
   });
 
   const halfSpan = config.totalSpan * 0.5;

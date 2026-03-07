@@ -5,6 +5,10 @@ import {
   WebGLRenderer
 } from 'three';
 
+export const RENDERER_SETTINGS = {
+  toneMappingExposure: 0.76
+} as const;
+
 export const createRenderer = (): WebGLRenderer => {
   const renderer = new WebGLRenderer({
     antialias: true,
@@ -14,7 +18,7 @@ export const createRenderer = (): WebGLRenderer => {
 
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.08;
+  renderer.toneMappingExposure = RENDERER_SETTINGS.toneMappingExposure;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFSoftShadowMap;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

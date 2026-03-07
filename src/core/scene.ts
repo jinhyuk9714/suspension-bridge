@@ -1,10 +1,17 @@
-import { Color, FogExp2, Scene } from 'three';
+import { Color, Scene } from 'three';
+
+export const SCENE_ATMOSPHERE = {
+  background: new Color(0x95a1ac),
+  backgroundIntensity: 0.54,
+  environmentIntensity: 0.3
+} as const;
 
 export const createScene = (): Scene => {
   const scene = new Scene();
 
-  scene.background = new Color(0xb4c2d3);
-  scene.fog = new FogExp2(0xc4cbd5, 0.00115);
+  scene.background = SCENE_ATMOSPHERE.background.clone();
+  scene.backgroundIntensity = SCENE_ATMOSPHERE.backgroundIntensity;
+  scene.environmentIntensity = SCENE_ATMOSPHERE.environmentIntensity;
 
   return scene;
 };

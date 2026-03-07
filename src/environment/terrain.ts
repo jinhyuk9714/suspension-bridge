@@ -25,6 +25,14 @@ export interface TerrainConfig {
   vegetationMaxHeight: number;
 }
 
+export interface TerrainAtmosphereSettings {
+  hazeColor: Color;
+  hazeStart: number;
+  hazeEnd: number;
+  hazeStrength: number;
+  lateralBias: number;
+}
+
 export const TERRAIN_CONFIG: TerrainConfig = {
   width: 1600,
   depth: 1100,
@@ -36,6 +44,14 @@ export const TERRAIN_CONFIG: TerrainConfig = {
   ridgeStrength: 46,
   vegetationMinHeight: 12,
   vegetationMaxHeight: 96
+};
+
+export const TERRAIN_ATMOSPHERE_SETTINGS: TerrainAtmosphereSettings = {
+  hazeColor: new Color(0x9da7b1),
+  hazeStart: 220,
+  hazeEnd: 760,
+  hazeStrength: 0.42,
+  lateralBias: 0.22
 };
 
 export const sampleTerrainHeight = (
@@ -88,6 +104,15 @@ const terrainColor = (height: number): Color => {
   return rock.clone().lerp(peak, clamp((height - 48) / 70, 0, 1));
 };
 
+export const getTerrainAtmosphereBlend = (
+  x: number,
+  z: number,
+  settings: TerrainAtmosphereSettings = TERRAIN_ATMOSPHERE_SETTINGS
+): number => {
+  const distanceMetric = Math.abs(z) + Math.abs(x) * settings.lateralBias;
+  return smoothstep(settings.hazeStart, settings.hazeEnd, distanceMetric) * settings.hazeStrength;
+};
+
 export const createTerrain = (config: TerrainConfig = TERRAIN_CONFIG): WorldModule<Group> => {
   const group = new Group();
   group.name = 'terrain';
@@ -112,6 +137,10 @@ export const createTerrain = (config: TerrainConfig = TERRAIN_CONFIG): WorldModu
     positions.setY(index, height);
 
     vertexColor.copy(terrainColor(height));
+    vertexColor.lerp(
+      TERRAIN_ATMOSPHERE_SETTINGS.hazeColor,
+      getTerrainAtmosphereBlend(samplePosition.x, samplePosition.z)
+    );
     colors[index * 3] = vertexColor.r;
     colors[index * 3 + 1] = vertexColor.g;
     colors[index * 3 + 2] = vertexColor.b;
