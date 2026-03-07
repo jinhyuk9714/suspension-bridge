@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+
+:root {
+  color-scheme: dark;
+  font-family: 'DM Sans', sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(255, 196, 125, 0.18), transparent 38%),
+    linear-gradient(180deg, #120f10 0%, #181d23 55%, #0e141b 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 8%, rgba(255, 195, 138, 0.26), transparent 34%),
+    linear-gradient(180deg, #17181b 0%, #0e141d 100%);
+}
+
+#app {
+  position: relative;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
