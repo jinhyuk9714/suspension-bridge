@@ -1,8 +1,10 @@
 # Suspension Bridge
 
-A real-time Three.js bridge study built with Vite and TypeScript.
+![Suspension Bridge overview](image/bridge-intro.png)
 
-The scene centers on a large suspension bridge crossing a coastal strait at golden hour. Everything is built procedurally: the bridge, the terrain, the water, the sky, and the ambient traffic moving across the deck. The goal was not to make a game level or a toy diorama. It was to make a clean, focused architectural showcase that feels large, readable, and cinematic as soon as it opens.
+A real-time bridge study built with Vite, TypeScript, and Three.js.
+
+This project started as a scene exercise and ended up closer to a small portfolio piece. The bridge, terrain, sky, water, and road traffic are all procedural. The target was simple: open the page and immediately get a strong sense of scale, structure, and atmosphere.
 
 ## What’s in the scene
 
@@ -28,6 +30,13 @@ npm run dev
 ```
 
 Open the local Vite URL in your browser.
+
+If you want a production build locally:
+
+```bash
+npm run build
+npm run preview
+```
 
 ## Validation
 
@@ -59,5 +68,5 @@ npm run build
 ## Notes
 
 - No external 3D models are used.
-- The bridge and environment are built from procedural geometry and tuned materials.
-- The codebase is split into small modules so the scene can be extended without rewriting the main setup.
+- The bridge and surrounding environment are built from procedural geometry and tuned materials.
+- The codebase is split into focused modules so the scene can be extended without reworking the whole setup.
